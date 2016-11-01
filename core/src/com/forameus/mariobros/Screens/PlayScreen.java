@@ -18,12 +18,13 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.forameus.mariobros.MarioBros;
 import com.forameus.mariobros.Scenes.Hud;
+import com.forameus.mariobros.Sprites.Goomba;
 import com.forameus.mariobros.Sprites.Mario;
 import com.forameus.mariobros.Tools.B2WorldCreator;
 import com.forameus.mariobros.Tools.WorldContactListener;
 
 
-public class PlayScreen implements Screen {
+public class  PlayScreen implements Screen {
 
     //Variables
     private MarioBros game;
@@ -40,7 +41,10 @@ public class PlayScreen implements Screen {
     private World world;
     private Box2DDebugRenderer b2dr;
 
+
+    //Sprites
     private Mario player;
+    private Goomba goomba;
 
     private Music music;
 
@@ -63,15 +67,17 @@ public class PlayScreen implements Screen {
         b2dr = new Box2DDebugRenderer();
 
 
-        new B2WorldCreator(world, map);
+        new B2WorldCreator(this);
 
-        player = new Mario(world, this);
+        player = new Mario(this);
 
         world.setContactListener(new WorldContactListener());
 
         music = MarioBros.manager.get("audio/music/mario_music.ogg", Music.class);
         music.setLooping(true);
         music.play();
+
+        goomba = new Goomba(this, 5.64f, .16f);
 
     }
 
@@ -100,6 +106,7 @@ public class PlayScreen implements Screen {
         world.step(1/60f, 6, 2);
 
         player.update(dt);
+        goomba.update(dt);
         hud.update(dt);
 
         gamecam.position.x = player.b2body.getPosition().x;
@@ -121,7 +128,10 @@ public class PlayScreen implements Screen {
 
         game.batch.setProjectionMatrix(gamecam.combined);
         game.batch.begin();
+
         player.draw(game.batch);
+        goomba.draw(game.batch);
+
         game.batch.end();
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
@@ -132,6 +142,15 @@ public class PlayScreen implements Screen {
     public void resize(int width, int height) {
         gamePort.update(width, height);
     }
+
+    public TiledMap getMap(){
+        return map;
+    }
+
+    public World getWorld(){
+        return world;
+    }
+
 
     @Override
     public void pause() {

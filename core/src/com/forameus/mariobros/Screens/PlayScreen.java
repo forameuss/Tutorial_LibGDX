@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -14,14 +15,21 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.forameus.mariobros.Items.Item;
+import com.forameus.mariobros.Items.ItemDef;
+import com.forameus.mariobros.Items.Mushroom;
 import com.forameus.mariobros.MarioBros;
 import com.forameus.mariobros.Scenes.Hud;
+import com.forameus.mariobros.Sprites.Enemy;
 import com.forameus.mariobros.Sprites.Goomba;
 import com.forameus.mariobros.Sprites.Mario;
 import com.forameus.mariobros.Tools.B2WorldCreator;
 import com.forameus.mariobros.Tools.WorldContactListener;
+
+import java.util.concurrent.LinkedBlockingQueue;
 
 
 public class  PlayScreen implements Screen {
@@ -40,14 +48,20 @@ public class  PlayScreen implements Screen {
 
     private World world;
     private Box2DDebugRenderer b2dr;
+    private B2WorldCreator creator;
 
 
     //Sprites
     private Mario player;
-    private Goomba goomba;
 
     private Music music;
 
+    private Array<Item> items;
+    private LinkedBlockingQueue<ItemDef> itemsToSpawn;
+
+
+    /**FPS**/
+    private FPSLogger fpsLogger;
 
     //Constructor
     public PlayScreen(MarioBros game){
@@ -66,8 +80,7 @@ public class  PlayScreen implements Screen {
         world = new World(new Vector2(0, -10), true);
         b2dr = new Box2DDebugRenderer();
 
-
-        new B2WorldCreator(this);
+        creator = new B2WorldCreator(this);
 
         player = new Mario(this);
 
@@ -77,9 +90,28 @@ public class  PlayScreen implements Screen {
         music.setLooping(true);
         music.play();
 
-        goomba = new Goomba(this, 5.64f, .16f);
+
+        items = new Array<Item>();
+        itemsToSpawn = new LinkedBlockingQueue<ItemDef>();
+
+        fpsLogger = new FPSLogger();
 
     }
+
+
+    public void spawnItem(ItemDef idef){
+        itemsToSpawn.add(idef);
+    }
+
+    public void handleSpawningItems(){
+        if(!itemsToSpawn.isEmpty()){
+            ItemDef idef = itemsToSpawn.poll();
+            if(idef.type== Mushroom.class){
+                items.add(new Mushroom(this, idef.position.x, idef.position.y));
+            }
+        }
+    }
+
 
     public TextureAtlas getAtlas(){
         return atlas;
@@ -102,11 +134,20 @@ public class  PlayScreen implements Screen {
 
     public void update(float dt){
         handleInput(dt);
+        handleSpawningItems();
 
         world.step(1/60f, 6, 2);
 
         player.update(dt);
-        goomba.update(dt);
+        for(Enemy enemy : creator.getGoombas()) {
+            enemy.update(dt);
+            if(enemy.getX() < player.getX() +  224/MarioBros.PPM)
+                enemy.b2body.setActive(true);
+        }
+
+        for(Item item   : items)
+            item.update(dt);
+
         hud.update(dt);
 
         gamecam.position.x = player.b2body.getPosition().x;
@@ -130,12 +171,18 @@ public class  PlayScreen implements Screen {
         game.batch.begin();
 
         player.draw(game.batch);
-        goomba.draw(game.batch);
+        for(Enemy enemy : creator.getGoombas())
+            enemy.draw(game.batch);
+        for(Item item : items)
+            item.draw(game.batch);
 
         game.batch.end();
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
+
+
+        fpsLogger.log();
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.forameus.mariobros.Sprites.Items.Mushroom;
 import com.forameus.mariobros.MarioBros;
 import com.forameus.mariobros.Scenes.Hud;
 import com.forameus.mariobros.Screens.PlayScreen;
+import com.forameus.mariobros.Sprites.Mario;
 
 
 public class Coin extends InteractiveTileObject {
@@ -26,7 +27,7 @@ public class Coin extends InteractiveTileObject {
 
 
     @Override
-    public void onHeadHit() {
+    public void onHeadHit(Mario mario) {
         if(!(getCell().getTile().getId() == BLANK_COIN))
             //Si el coin contiene la propiedad mushroom, spawnea uno
             if(object.getProperties().containsKey("mushroom"))

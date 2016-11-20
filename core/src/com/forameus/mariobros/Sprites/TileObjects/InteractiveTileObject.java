@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.forameus.mariobros.MarioBros;
 import com.forameus.mariobros.Screens.PlayScreen;
+import com.forameus.mariobros.Sprites.Mario;
 
 
 public abstract class InteractiveTileObject {
@@ -52,7 +53,7 @@ public abstract class InteractiveTileObject {
     }
 
 
-    public abstract void onHeadHit();
+    public abstract void onHeadHit(Mario mario);
 
     public void setCategoryFilter(short filterBit){
         Filter filter = new Filter();

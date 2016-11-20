@@ -1,4 +1,4 @@
-package com.forameus.mariobros.Items;
+package com.forameus.mariobros.Sprites.Items;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import com.forameus.mariobros.MarioBros;
 import com.forameus.mariobros.Screens.PlayScreen;
+import com.forameus.mariobros.Sprites.Mario;
 
 public abstract class Item extends Sprite {
     protected PlayScreen screen;
@@ -27,7 +28,7 @@ public abstract class Item extends Sprite {
     }
 
     public abstract void defineItem();
-    public abstract void use();
+    public abstract void use(Mario mario);
 
     public void update(float dt){
         if(toDestroy && !destroyed){
@@ -43,5 +44,12 @@ public abstract class Item extends Sprite {
 
     public void destroy(){
         toDestroy=true;
+    }
+
+    public void reverseVelocity(boolean x, boolean y){
+        if(x)
+            velocity.x = -velocity.x;
+        if(y)
+            velocity.y = -velocity.y;
     }
 }

@@ -1,4 +1,4 @@
-package com.forameus.mariobros.Items;
+package com.forameus.mariobros.Sprites.Items;
 
 import com.badlogic.gdx.math.Vector2;
 

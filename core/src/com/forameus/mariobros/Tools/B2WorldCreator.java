@@ -12,10 +12,9 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.forameus.mariobros.MarioBros;
 import com.forameus.mariobros.Screens.PlayScreen;
-import com.forameus.mariobros.Sprites.Brick;
-import com.forameus.mariobros.Sprites.Coin;
-import com.forameus.mariobros.Sprites.Goomba;
-import com.forameus.mariobros.Sprites.Mario;
+import com.forameus.mariobros.Sprites.TileObjects.Brick;
+import com.forameus.mariobros.Sprites.TileObjects.Coin;
+import com.forameus.mariobros.Sprites.Enemies.Goomba;
 
 public class B2WorldCreator {
 
@@ -65,14 +64,14 @@ public class B2WorldCreator {
         for(MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)){
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
 
-            new Brick(screen, rect);
+            new Brick(screen, object);
         }
 
         //Monedas
         for(MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
 
-            new Coin(screen, rect);
+            new Coin(screen, object);
         }
 
         //Goombas
